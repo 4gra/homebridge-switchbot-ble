@@ -95,7 +95,16 @@ export class Bot implements AccessoryPlugin {
             this.runTimer = setTimeout(() => {
               this.botService?.getCharacteristic(hap.Characteristic.On).updateValue(this.switchOn);
             }, 500);
-            log.info("Bot state has been set to: " + (this.switchOn ? "ON" : "OFF"));
+	    log.info("Bot state has been set to: " + (this.switchOn ? "ON" : "OFF"));
+
+            if (this.autoOffTime > 0) {
+              log.info("Scheduling auto-off for "+this.autoOffTime+" seconds.");
+              this.runTimer = setTimeout(() => {
+                this.botService?.getCharacteristic(hap.Characteristic.On).updateValue(false);
+		log.info("Value returned to off automatically.");
+	      }, (1000*this.autoOffTime));
+	    }
+
             callback();
           })
           .catch((error: any) => {
@@ -106,16 +115,6 @@ export class Bot implements AccessoryPlugin {
             log.info("Bot state failed to be set to: " + (targetState ? "ON" : "OFF"));
             callback();
           })
-          .then(() => {
-              if (this.autoOffTime > 0) {
-                log.info("Scheduling auto-off for "+this.autoOffTime+" seconds.");
-                this.runTimer = setTimeout(() => {
-                  this.botService?.getCharacteristic(hap.Characteristic.On).updateValue(false);
-                }, (1000*this.autoOffTime));
-                log.info("Value returned to off automatically.");
-                callback();
-              }
-          });
       });
 
     this.informationService = new hap.Service.AccessoryInformation()
