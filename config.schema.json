@@ -63,6 +63,10 @@
               "type": "boolean",
               "title": "Reverse Dir (For Curtain. Default is false)"
             },
+            "autoOffTime": {
+              "type": "integer",
+              "title": "Number of seconds after which the HomeKit accessory returns to 'off' (For Bot, in 'push' mode. Default is `0`s, which disables auto-off)"
+            },
             "moveTime": {
               "type": "integer",
               "title": "Actual running time (For Curtain. Default is 2000ms)"
