@@ -18,6 +18,7 @@ export class Bot implements AccessoryPlugin {
   private readonly log: Logging;
   private readonly bleMac: string;
   private readonly scanDuration: number;
+  private readonly autoOffTime: number;
 
   private switchOn = false;
   private runTimer!: NodeJS.Timeout;
@@ -28,11 +29,12 @@ export class Bot implements AccessoryPlugin {
   private readonly botService: Service;
   private readonly informationService: Service;
 
-  constructor(hap: HAP, log: Logging, name: string, bleMac: string, scanDuration: number) {
+  constructor(hap: HAP, log: Logging, name: string, bleMac: string, scanDuration: number, autoOffTime: number) {
     this.log = log;
     this.name = name;
     this.bleMac = bleMac;
     this.scanDuration = scanDuration;
+    this.autoOffTime = autoOffTime;
 
     this.botService = new hap.Service.Switch(name);
     this.botService
@@ -103,6 +105,16 @@ export class Bot implements AccessoryPlugin {
             }, 500);
             log.info("Bot state failed to be set to: " + (targetState ? "ON" : "OFF"));
             callback();
+          })
+          .then(() => {
+              if (this.autoOffTime > 0) {
+                log.info("Scheduling auto-off for "+this.autoOffTime+" seconds.");
+                this.runTimer = setTimeout(() => {
+                  this.botService?.getCharacteristic(hap.Characteristic.On).updateValue(false);
+                }, (1000*this.autoOffTime));
+                log.info("Value returned to off automatically.");
+                callback();
+              }
           });
       });
 
