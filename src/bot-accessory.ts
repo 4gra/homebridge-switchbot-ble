@@ -97,7 +97,7 @@ export class Bot implements AccessoryPlugin {
             }, 500);
 	    log.info("Bot state has been set to: " + (this.switchOn ? "ON" : "OFF"));
 
-            if (this.autoOffTime > 0) {
+            if (this.switchOn && this.autoOffTime > 0) {
               log.info("Scheduling auto-off for "+this.autoOffTime+" seconds.");
               this.runTimer = setTimeout(() => {
                 this.botService?.getCharacteristic(hap.Characteristic.On).updateValue(false);
